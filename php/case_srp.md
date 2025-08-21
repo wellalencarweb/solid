@@ -214,3 +214,7 @@ class CommandC {
 - Evita **efeito colateral** em outros comandos  
 - Facilita **testes unitários/integrados**  
 - Segue o princípio **SRP (Single Responsibility Principle)**
+
+[🔗 SOLID: PHP](./solid_php.md)
+
+

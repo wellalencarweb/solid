@@ -27,6 +27,10 @@
 
 ## ⚡ Single Responsibility Principle
 
+<img src="solid_01_srp.png" alt="Single Responsibility Principle" style="width:100%;display:block;margin:0 auto;" />
+
+---
+
 **📖 Conceito:**
 "Uma classe deve ter apenas uma razão para mudar"
 
@@ -68,6 +72,12 @@ class OrderRepository {
 ---
 
 ## 🔓 Open/Closed Principle
+
+
+<img src="solid_02_ocp.png" alt="Open/Closed Principle" style="width:100%;display:block;margin:0 auto;" />
+
+---
+
 
 **📖 Conceito:**
 "Entidades devem estar abertas para extensão, mas fechadas para modificação"
@@ -115,6 +125,10 @@ class PaymentProcessor {
 
 ## 🔄 Liskov Substitution Principle
 
+<img src="solid_03_lsp.png" alt="Liskov Substitution Principle" style="width:100%;display:block;margin:0 auto;" />
+
+---
+
 **📖 Conceito:**
 "Subtipo deve ser substituível por seu tipo base sem alterar o comportamento"
 
@@ -158,6 +172,10 @@ class Penguin implements SwimmingBird {
 ---
 
 ## 🧩 Interface Segregation Principle
+
+<img src="solid_04_isp.png" alt="Interface Segregation Principle" style="width:100%;display:block;margin:0 auto;" />    
+
+---
 
 **📖 Conceito:**
 "Muitas interfaces específicas são melhores que uma interface geral"
@@ -209,7 +227,11 @@ class Robot implements Workable {
 
 ---
 
-## 🔌 Slide 6: Dependency Inversion Principle
+## 🔌 Dependency Inversion Principle
+
+<img src="solid_05_dip.png" alt="Dependency Inversion Principle" style="width:100%;display:block;margin:0 auto;" />
+
+---
 
 **📖 Conceito:**
 "Dependa de abstrações, não de implementações concretas"
@@ -262,26 +284,9 @@ class UserRepository {
 
 ## 🧪 Caso Prático
 
-**✅ Exemplo:**
-```php
-class OrderService {
-    public function __construct(
-        private PaymentMethod $paymentMethod,
-        private NotificationService $notification
-    ) {}
-    
-    public function processOrder(Order $order) {
-        $this->paymentMethod->process($order);
-        $this->notification->send($order);
-    }
-}
-```
 
-**🎁 Benefícios Combinados:**
-- Código altamente testável
-- Fácil manutenção e evolução
-- Baixo acoplamento entre componentes
-- Escalabilidade e flexibilidade
+[🔗 Caso Prático: Single Responsibility Principle](./case_srp.md)
+
 
 ---
 
