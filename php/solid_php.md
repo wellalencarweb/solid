@@ -39,9 +39,9 @@
 class Order {
     public function addItem(string $item, float $price): void {}
     public function calculateTotal(): float {}
-    public function processPayment(): void {}
-    public function sendEmail(): void {}
-    public function saveToDatabase(): void {}
+    public function processPayment(): void {} // 🚨
+    public function sendEmail(): void {} // 🚨
+    public function saveToDatabase(): void {} // 🚨
 }
 
 $order = new Order();
