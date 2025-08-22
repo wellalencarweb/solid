@@ -103,7 +103,7 @@ class CommandC {
 ---
 
 
-### 📦 Mas... A vida do programdor é uma Caixinha de Surpresas 
+### 📦 Mas... A vida do programador é uma Caixinha de Surpresas 
 
 💣 Um dia deu problema nessa consulta para um `Command A`.  
 - Ajuste feito → resolveu para `A`, mas **quebrou `B`**.  

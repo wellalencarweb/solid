@@ -37,30 +37,56 @@
 **❌ Exemplo Problemático:**
 ```php
 class Order {
-    public function calculateTotal() {}
-    public function processPayment() {}
-    public function sendEmail() {}
-    public function saveToDatabase() {}
+    public function addItem(string $item, float $price): void {}
+    public function calculateTotal(): float {}
+    public function processPayment(): void {}
+    public function sendEmail(): void {}
+    public function saveToDatabase(): void {}
 }
+
+$order = new Order();
+$order->addItem("Produto A", 100);
+$order->addItem("Produto B", 50);
+$order->processPayment();
+$order->sendEmail();
+$order->saveToDatabase();
 ```
 
 **✅ Exemplo Corrigido:**
 ```php
-class Order {
-    public function calculateTotal() {}
+// Classe responsável apenas pelo pedido
+class OrderSRP {
+    public function addItem(string $item, float $price): void {}
+    public function calculateTotal(): float {}
 }
 
+// Classe responsável pelo pagamento
 class PaymentProcessor {
-    public function processPayment(Order $order) {}
+    public function processPayment(OrderSRP $order): void {}
 }
 
+// Classe responsável por enviar emails
 class EmailService {
-    public function sendOrderConfirmation(Order $order) {}
+    public function sendOrderConfirmation(OrderSRP $order): void {}
 }
 
+// Classe responsável pelo repositório (banco de dados)
 class OrderRepository {
-    public function save(Order $order) {}
+    public function save(OrderSRP $order): void {}
 }
+
+// Exemplo de uso
+$order = new OrderSRP();
+$order->addItem("Produto X", 200);
+$order->addItem("Produto Y", 80);
+
+$payment = new PaymentProcessor();
+$email   = new EmailService();
+$repo    = new OrderRepository();
+
+$payment->processPayment($order);
+$email->sendOrderConfirmation($order);
+$repo->save($order);
 ```
 
 **🎁 Benefícios:**
@@ -88,32 +114,51 @@ class PaymentProcessor {
     public function process($paymentType) {
         if ($paymentType === 'credit_card') {
             // process credit card
-        } elseif ($paymentType === 'paypal') {
-            // process paypal
+        } elseif ($paymentType === 'picpay_card') {
+            // process picpay_card
         }
     }
 }
+
+$processor = new PaymentProcessor();
+$processor->process("credit_card");
+$processor->process("picpay_card");
+$processor->process("paypal"); // 🚨
+
 ```
 
 **✅ Exemplo Corrigido:**
 ```php
+// Abstração para métodos de pagamento
 interface PaymentMethod {
-    public function process();
+    public function process(): void;
 }
 
+// Implementação para cartão de crédito
 class CreditCardPayment implements PaymentMethod {
-    public function process() {}
+    public function process(): void {}
 }
 
-class PayPalPayment implements PaymentMethod {
-    public function process() {}
+// Implementação para Cartão Picpay
+class PicpayCardPayment implements PaymentMethod {
+    public function process(): void {}
 }
 
-class PaymentProcessor {
-    public function processPayment(PaymentMethod $paymentMethod) {
+// Processador que depende da abstração, não de condições fixas
+class PaymentProcessorOCP {
+    public function processPayment(PaymentMethod $paymentMethod): void {
         $paymentMethod->process();
     }
 }
+
+// Exemplo de uso (correto com OCP)
+$processor = new PaymentProcessorOCP();
+$processor->processPayment(new CreditCardPayment()); 
+$processor->processPayment(new PicpayCardPayment());
+
+// ➕ Para adicionar novos métodos de pagamento (ex.: PixPayment)
+// basta criar uma nova classe que implementa PaymentMethod.
+// Nenhuma modificação no PaymentProcessor é necessária.
 ```
 
 **🎁 Benefícios:**
@@ -135,32 +180,62 @@ class PaymentProcessor {
 **❌ Exemplo Problemático:**
 ```php
 class Bird {
-    public function fly() {}
+    public function fly(): void {}
+}
+
+class Eagle extends Bird {
+    public function fly(): void {}
 }
 
 class Penguin extends Bird {
-    public function fly() {
+    public function fly(): void {
+        // 🚫 Problema: pinguins não voam!
         throw new Exception("Penguins can't fly!");
     }
 }
+
+// Exemplo de uso (problema)
+$birds = [new Eagle(), new Penguin()];
+foreach ($birds as $bird) {
+    // Ao chamar fly(), esperamos que todos os "Birds" voem
+    $bird->fly(); // 🚨
+}
+
 ```
 
 **✅ Exemplo Corrigido:**
 ```php
+
+// Interface para aves que voam
 interface FlyingBird {
-    public function fly();
+    public function fly(): void;
 }
 
+// Interface para aves que nadam
 interface SwimmingBird {
-    public function swim();
+    public function swim(): void;
 }
 
-class Eagle implements FlyingBird {
-    public function fly() {}
+class EagleLSP implements FlyingBird {
+    public function fly(): void {}
 }
 
-class Penguin implements SwimmingBird {
-    public function swim() {}
+class PenguinLSP implements SwimmingBird {
+    public function swim(): void {}
+}
+
+// Exemplo de uso (correto com LSP)
+
+// Lista de aves que voam
+$flyingBirds = [new EagleLSP()];
+foreach ($flyingBirds as $bird) {
+    $bird->fly(); // ✅ Todos podem voar sem problemas
+}
+
+// Lista de aves que nadam
+$swimmingBirds = [new PenguinLSP()];
+foreach ($swimmingBirds as $bird) {
+    $bird->swim(); // ✅ Todos podem nadar sem problemas
 }
 ```
 
@@ -188,35 +263,69 @@ interface Worker {
     public function sleep();
 }
 
+class Human implements Worker {
+    public function work(): void {}
+    public function eat(): void {}
+    public function sleep(): void {}
+}
+
 class Robot implements Worker {
     public function work() {}
-    public function eat() { /* Robots don't eat! */ }
-    public function sleep() { /* Robots don't sleep! */ }
+    public function eat() {}
+    public function sleep() {}
+}
+
+// Exemplo de uso
+$workers = [new Human(), new RobotProblem()];
+foreach ($workers as $worker) {
+    $worker->work();
+    $worker->eat();   // 🚨
+    $worker->sleep(); // 🚨 
 }
 ```
 
 **✅ Exemplo Corrigido:**
 ```php
 interface Workable {
-    public function work();
+    public function work(): void;
 }
 
 interface Eatable {
-    public function eat();
+    public function eat(): void;
 }
 
 interface Sleepable {
-    public function sleep();
+    public function sleep(): void;
 }
 
 class Human implements Workable, Eatable, Sleepable {
-    public function work() {}
-    public function eat() {}
-    public function sleep() {}
+    public function work(): void {}
+    public function eat(): void {}
+    public function sleep(): void {}
 }
 
 class Robot implements Workable {
-    public function work() {}
+    public function work(): void {}
+}
+
+// Exemplo de uso (correto com ISP)
+
+// Lista de trabalhadores
+$workers = [new Human(), new Robot()];
+foreach ($workers as $worker) {
+    $worker->work(); // ✅ Tanto Human quanto Robot trabalham
+}
+
+// Lista de quem come
+$eaters = [new Human()];
+foreach ($eaters as $eater) {
+    $eater->eat(); // ✅ Apenas Human
+}
+
+// Lista de quem dorme
+$sleepers = [new Human()];
+foreach ($sleepers as $sleeper) {
+    $sleeper->sleep(); // ✅ Apenas Human
 }
 ```
 
@@ -246,32 +355,46 @@ class UserRepository {
     private $connection;
     
     public function __construct() {
-        $this->connection = new MySQLConnection();
+        $this->connection = new MySQLConnection(); // 🚨
     }
 }
+
+$repo = new UserRepository();
 ```
 
 **✅ Exemplo Corrigido:**
 ```php
 interface DatabaseConnection {
-    public function connect();
+    public function connect(): void;
 }
 
-class MySQLConnection implements DatabaseConnection {
-    public function connect() {}
+class MySQLConnectionDIP implements DatabaseConnection {
+    public function connect(): void {}
 }
 
 class PostgreSQLConnection implements DatabaseConnection {
-    public function connect() {}
+    public function connect(): void {}
 }
 
 class UserRepository {
-    private $connection;
-    
+    private DatabaseConnection $connection;
+
+    // ✅ Depende da abstração (interface), não da implementação concreta
     public function __construct(DatabaseConnection $connection) {
         $this->connection = $connection;
     }
+
+    public function saveUser(array $user): void {}
 }
+
+// Exemplo de uso (correto com DIP)
+
+// Podemos usar MySQL
+$mysqlRepo = new UserRepository(new MySQLConnectionDIP());
+
+// Ou PostgreSQL, sem mudar o UserRepository
+$pgsqlRepo = new UserRepository(new PostgreSQLConnection());
+
 ```
 
 **🎁 Benefícios:**
